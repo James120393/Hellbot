@@ -12,6 +12,9 @@ namespace POSH_StarCraftBot.behaviours
 {
     public class CombatControl : AStarCraftBehaviour
     {
+		public bool defendBase = false;
+		private int maxBaseLocations;
+		private int baseCounter = 1;
 
         /// <summary>
         /// the key is the units ID which does not change over the course of a game
@@ -101,7 +104,7 @@ namespace POSH_StarCraftBot.behaviours
                 // do the builders need to get involved with the fight
 				IEnumerable<Unit> force = null;
 				if (!builder)
-					force = Interface().GetAllUnits(false);
+					force = Interface().GetAllUnits(false).Where(un => un.getHitPoints() > 0);
 				if (builder)
 					force = Interface().GetAllUnits(false).Concat(Interface().GetAllUnits(true));
                 // if the enemy needs harrasing
@@ -174,7 +177,7 @@ namespace POSH_StarCraftBot.behaviours
                 // do the builders need to get involved with the fight
                 IEnumerable<Unit> force = null;
                 if (!builder)
-                    force = Interface().GetAllUnits(false);
+					force = Interface().GetAllUnits(false).Where(un => un.getHitPoints() > 0);
                 if (builder)
                     force = Interface().GetAllUnits(false).Concat(Interface().GetAllUnits(true));
                 // if the enemy needs harrasing
@@ -248,7 +251,7 @@ namespace POSH_StarCraftBot.behaviours
                 // do the builders need to get involved with the fight
                 IEnumerable<Unit> force = null;
                 if (!builder)
-                    force = Interface().GetAllUnits(false);
+					force = Interface().GetAllUnits(false).Where(un => un.getHitPoints() > 0);
                 if (builder)
                     force = Interface().GetAllUnits(false).Concat(Interface().GetAllUnits(true));
                 // if the enemy needs harrasing
@@ -318,6 +321,64 @@ namespace POSH_StarCraftBot.behaviours
         //
         // ACTIONS
         //
+		[ExecutableAction("ForceScouting")]
+		public bool ForceScouting()
+		{
+			IEnumerable<Unit> force = null;
+			force = Interface().GetAllUnits(false).Where(un => un.getHitPoints() > 0);
+
+				IEnumerable<BaseLocation> baseloc = Interface().basePositions;
+
+				if (baseloc.Count() > maxBaseLocations)
+					maxBaseLocations = baseloc.Count();
+				if (baseloc.Count() < maxBaseLocations && baseCounter > baseloc.Count())
+					return false;
+				// reached the last accessible base location away and turn back to base
+				if (baseCounter > maxBaseLocations)
+					baseCounter = 1;
+
+
+				if (force.All(unit => unit.isUnderAttack()))
+				{
+					if (Interface().baseLocations.ContainsKey((int)BuildSite.Natural))
+						force.All(unit => unit.move(new Position(Interface().baseLocations[(int)BuildSite.Natural])));
+					else if (Interface().baseLocations.ContainsKey((int)BuildSite.Extension))
+					{
+						force.All(unit => unit.move(new Position(Interface().baseLocations[(int)BuildSite.Extension])));
+					}
+					return false;
+				}
+
+
+				// still scouting
+				if (force.All(unit => unit.isMoving()))
+					return true;
+
+				double distance = force.First().getPosition().getDistance(
+					baseloc.OrderBy(loc => bwta.getGroundDistance(loc.getTilePosition(), Interface().baseLocations[(int)BuildSite.StartingLocation]))
+						.ElementAt(baseCounter)
+						.getPosition()
+						);
+				if (distance < DELTADISTANCE * 2)
+				{
+					// close to another base location
+					if (!Interface().baseLocations.ContainsKey(baseCounter))
+						Interface().baseLocations[baseCounter] = new TilePosition(force.First().getTargetPosition());
+					baseCounter++;
+					return true;
+				}
+				else
+				{
+					bool executed = false;
+					if (baseloc.Count() > baseCounter)
+						executed = force.All(unit => unit.move(baseloc.ElementAt(baseCounter).getPosition()));
+					// if (_debug_)
+					Console.Out.WriteLine("Force is scouting: " + executed);
+					return executed;
+				}
+
+		}
+
         // Move forces to natural
 		[ExecutableAction("MoveForceNatural")]
 		public bool MoveForceNatural()
@@ -432,6 +493,7 @@ namespace POSH_StarCraftBot.behaviours
 			IEnumerable<Unit> shownUnits = bwapi.Broodwar.enemy().getUnits().Where(units => units.getHitPoints() > 0).Where(units => !units.getType().isBuilding());
             IEnumerable<Unit> enemyBuildingsShown = bwapi.Broodwar.enemy().getUnits().Where(units => units.getHitPoints() > 0).Where(units => units.getType().isBuilding());
             bool detectedNew = false;
+			defendBase = false;
 
             // Go through each building in sight adding to a dictionary its ID and position
             foreach (Unit build in enemyBuildingsShown)
@@ -479,32 +541,60 @@ namespace POSH_StarCraftBot.behaviours
         [ExecutableSense("BaseUnderAttack")]
         public bool BaseUnderAttack()
         {
-            if (Interface().GetAllBuildings().Count() < 1)
-                return false;
-            int attackCounter = Interface().GetAllBuildings().Where(building => building.isUnderAttack()).Count();
-            if (attackCounter > 0)
-                return true;
-
-            int randomMult = 3;
-
-            // Go thorugh each enemy on screen and if its too close print to screen
-            foreach (Unit enemy in bwapi.Broodwar.enemy().getUnits().Where(unit => unit.getPosition().getDistance(new Position(Interface().baseLocations[(int)BuildSite.StartingLocation])) <= randomMult * DELTADISTANCE))
-                Console.Out.WriteLine(++attackCounter + "enemy at:" + enemy.getTilePosition().xConst() + "" + enemy.getTilePosition().yConst());
-
-            // if the enemy is at a base and is attacking that base, return the location of the base and ture or flase if it is under attack
-            if (Interface().baseLocations.ContainsKey((int)BuildSite.StartingLocation))
-            {
-                attackCounter += Interface().GetAllUnits(true).Where(unit => unit.isUnderAttack() && unit.getPosition().getDistance(new Position(Interface().baseLocations[(int)BuildSite.StartingLocation])) < randomMult * DELTADISTANCE).Count();
-            }
-            if (Interface().baseLocations.ContainsKey((int)BuildSite.Natural))
-            {
-                attackCounter += Interface().GetAllUnits(true).Where(unit => unit.isUnderAttack() && unit.getPosition().getDistance(new Position(Interface().baseLocations[(int)BuildSite.Natural])) < randomMult * DELTADISTANCE).Count();
-            }
-			if (Interface().baseLocations.ContainsKey((int)BuildSite.NaturalChoke))
+			// Get all enemy units and then buildings in two seperate lists
+			IEnumerable<Unit> shownUnits = bwapi.Broodwar.enemy().getUnits().Where(units => units.getHitPoints() > 0).Where(units => !units.getType().isBuilding());
+			defendBase = false;
+			foreach (Unit unit in shownUnits)
 			{
-				attackCounter += Interface().GetAllUnits(true).Where(unit => unit.isUnderAttack() && unit.getPosition().getDistance(new Position(Interface().baseLocations[(int)BuildSite.NaturalChoke])) < randomMult * DELTADISTANCE).Count();
+				try
+				{
+					// If it is alive then return true
+					if (unit.getHitPoints() > 0)
+					{						
+						foreach (Unit building in Interface().GetAllBuildings())
+						{
+							if (unit.getDistance(building.getPosition()) < DELTADISTANCE * 2)
+							{
+								defendBase = true;
+								Console.Out.WriteLine("Enemy Detected at Base");
+							}
+						}
+					}
+				}
+				catch
+				{
+					break;
+				}
 			}
-            return attackCounter > 0;
+			return defendBase;
+
+
+            //if (Interface().GetAllBuildings().Count() < 1)
+            //    return false;
+            //int attackCounter = Interface().GetAllBuildings().Where(building => building.isUnderAttack()).Count();
+            //if (attackCounter > 0)
+            //    return true;
+			//
+            //int randomMult = 3;
+			//
+            //// Go thorugh each enemy on screen and if its too close print to screen
+            //foreach (Unit enemy in bwapi.Broodwar.enemy().getUnits().Where(unit => unit.getPosition().getDistance(new Position(Interface().baseLocations[(int)BuildSite.StartingLocation])) <= randomMult * DELTADISTANCE))
+            //    Console.Out.WriteLine(++attackCounter + "enemy at:" + enemy.getTilePosition().xConst() + "" + enemy.getTilePosition().yConst());
+			//
+            //// if the enemy is at a base and is attacking that base, return the location of the base and ture or flase if it is under attack
+            //if (Interface().baseLocations.ContainsKey((int)BuildSite.StartingLocation))
+            //{
+            //    attackCounter += Interface().GetAllUnits(true).Where(unit => unit.isUnderAttack() && unit.getPosition().getDistance(new Position(Interface().baseLocations[(int)BuildSite.StartingLocation])) < randomMult * DELTADISTANCE).Count();
+            //}
+            //if (Interface().baseLocations.ContainsKey((int)BuildSite.Natural))
+            //{
+            //    attackCounter += Interface().GetAllUnits(true).Where(unit => unit.isUnderAttack() && unit.getPosition().getDistance(new Position(Interface().baseLocations[(int)BuildSite.Natural])) < randomMult * DELTADISTANCE).Count();
+            //}
+			//if (Interface().baseLocations.ContainsKey((int)BuildSite.NaturalChoke))
+			//{
+			//	attackCounter += Interface().GetAllUnits(true).Where(unit => unit.isUnderAttack() && unit.getPosition().getDistance(new Position(Interface().baseLocations[(int)BuildSite.NaturalChoke])) < randomMult * DELTADISTANCE).Count();
+			//}
+            //return attackCounter > 0;
         }
 
         // Defend against the Zerg

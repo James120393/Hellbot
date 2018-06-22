@@ -439,6 +439,7 @@
 (SDC EighteenNexusOpening (goal ((GameRunning 0.0 =)))
 	(drives			
 		(		(defend (trigger ((EnemyDetected 1.0 ==)(BaseUnderAttack 1.0 ==))) defendLocation(seconds 0.2)))
+		(		(defend (trigger ((EnemyDetected 0.0 ==)(DarkTemplarCount 10.0 >=))) ForceScouting(seconds 0.2)))
 		(		(scout (trigger ((ArchivesCount 1.0 >=) (NaturalFound 0.0 ==))) exploreLocal (seconds 0.001)))
 		(		(harvest (trigger ((IdleProbes))) probeHarvesting(seconds 0.0003)))
 		(		(retreat (trigger ((ForceIsLosing 1.0 =))) flee(seconds 1.0)))		

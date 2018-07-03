@@ -76,6 +76,7 @@
     <Compile Include="behaviours\UnitControl.cs" />
     <Compile Include="BODStarCraftBot.cs" />
     <Compile Include="Core.cs" />
+    <Compile Include="IStarcraftBot.cs" />
     <Compile Include="logic\SCMath.cs" />
     <Compile Include="logic\TacticalAgent.cs" />
     <Compile Include="logic\UnitAgent.cs" />
@@ -85,17 +86,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\bwapi-clr-client\bwapi-clr\bwapi-clr.csproj">
+    <ProjectReference Include="O:\StarCraftAI - Project\BWAPI\bwapi-mono-bridge2\Source\bwapi-clr-client\bwapi-clr\bwapi-clr.csproj">
       <Project>{6657C37C-4F1B-4972-AAB0-B395EE5F53DF}</Project>
       <Name>bwapi-clr</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\bwapi-clr-client\StarcraftBotLib\StarcraftBotLib.csproj">
-      <Project>{70550A19-51BF-46AE-B748-07191E2CF155}</Project>
-      <Name>StarcraftBotLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="library\init\POSH-StarCraftBot_init" />
     <Content Include="library\init\POSH-HellBot_init.txt" />
     <None Include="library\plans\PSCB-Protoss.lap" />
@@ -105,7 +103,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y  "$(ProjectDir)$(OutDir)POSH-SCBot.dll" "$(SolutionDir)..\..\$(ConfigurationName)\Libs\client"
+    <PostBuildEvent>copy /y  "$(ProjectDir)$(OutDir)$(TargetName).dll" "$(SolutionDir)..\..\$(ConfigurationName)\Libs\client"
 copy /y  "$(ProjectDir)$(OutDir)$(TargetName).dll" "$(ProjectDir)..\POSH-Launcher\library"
 copy /y  "$(ProjectDir)\library\plans\*.lap" "$(ProjectDir)..\POSH-Launcher\library\plans"
 copy /y  "$(ProjectDir)\library\init\$(TargetName)_init*" "$(ProjectDir)..\POSH-Launcher\library\init"

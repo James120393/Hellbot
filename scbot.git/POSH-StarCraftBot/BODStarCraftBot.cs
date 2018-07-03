@@ -82,7 +82,7 @@ namespace POSH_StarCraftBot
             bwapi.Broodwar.setLocalSpeed(0);
             bwapi.Broodwar.setFrameSkip(200);
             System.Console.WriteLine("Starting Match!");
-            bwapi.Broodwar.sendText("Hello world! This is POSH!");
+            bwapi.Broodwar.sendText("This is HellBot a poshSHARP based planning agent!");
             mapDim = new int[2];
             ActivePlayers = new Dictionary<string, Player>();
             UnitDiscovered = new Dictionary<long, Unit>();

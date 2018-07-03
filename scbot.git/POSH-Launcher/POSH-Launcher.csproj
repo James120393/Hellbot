@@ -90,11 +90,17 @@
     <Content Include="library\init\POSH-SCBot_init.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="library\POSH-HellBot.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="library\POSH-SCBot.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="library\init\POSH-HellBot_init.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="library\init\POSH-StarCraftBot_init">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -103,9 +109,12 @@
     </None>
     <None Include="library\plans\PSCB-Basic.lap" />
     <None Include="library\plans\PSCB-Carrier.lap" />
+    <None Include="library\plans\PSCB-Protoss.lap">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="O:\StarCraftAI - Project\BWAPI\bwapi-mono-bridge2\Source\bwapi-clr-client\bwapi-clr\bwapi-clr.csproj">
+    <ProjectReference Include="..\..\..\bwapi-clr-client\bwapi-clr\bwapi-clr.csproj">
       <Project>{6657C37C-4F1B-4972-AAB0-B395EE5F53DF}</Project>
       <Name>bwapi-clr</Name>
     </ProjectReference>
@@ -129,8 +138,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
+    <PreBuildEvent>copy /y  "$(SolutionDir)..\..\$(ConfigurationName)\Libs\client\bwapi-native.dll" "$(ProjectDir)$(OutDir)"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

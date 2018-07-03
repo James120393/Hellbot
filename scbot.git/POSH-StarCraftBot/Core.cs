@@ -259,7 +259,7 @@ namespace POSH_StarCraftBot
         {
             try
             {
-                System.Console.WriteLine("Behaviour Oriented Design Bot .50");
+                System.Console.WriteLine("Team HellBot poshSHARP reactive Planning Bot .70");
                 if (IntPtr.Size == 8)
                 {
                     System.Console.WriteLine("64bit");

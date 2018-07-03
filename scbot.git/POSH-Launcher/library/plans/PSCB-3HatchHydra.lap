@@ -289,6 +289,14 @@
 		(trainObserver (trigger ((ObserverCount 1.0 <) (ObservatoryCount 1.0 >=))) TrainObserver)	)
 	)
 )
+(C TerranMidGameForce (minutes 1.0) (goal ((GameRunning 0.0 =)))
+	(elements
+		(	
+		(trainObserver (trigger ((ObserverCount 1.0 <) (ObservatoryCount 1.0 >=))) TrainObserver)	)
+		(
+		(trainCorsair (trigger ((CorsairCount 6 <) (StargateCount 1 >=))) TrainCorsair)   )
+	)
+)
 (C TwoGateDarkTemplarBuild (minutes 1.0) (goal ((GameRunning 0.0 ==)))
 	(elements
 		(
@@ -335,6 +343,8 @@
 		(buildRoboticsFacility (trigger ((ArchivesCount 1.0 >=) (RoboticsFacilityCount 0.0 ==))) buildRoboticsFacility)	)
 		(
 		(buildObservatory (trigger ((RoboticsFacilityCount 1.0 >=) (ObservatoryCount 0.0 ==))) buildObservatory)	)
+		(
+		(buildStargate (trigger ((EnterMidGame 1.0 ==) (StargateCount 0.0 ==))) buildStargate)	)
 	)
 )
 (C ObserverResearch (minutes 1.0) (goal ((GameRunning 0.0 =)))
@@ -438,23 +448,24 @@
 
 (SDC EighteenNexusOpening (goal ((GameRunning 0.0 =)))
 	(drives			
-		(		(defend (trigger ((EnemyDetected 1.0 ==)(BaseUnderAttack 1.0 ==))) defendLocation(seconds 0.2)))
-		(		(defend (trigger ((EnemyDetected 0.0 ==)(DarkTemplarCount 10.0 >=))) ForceScouting(seconds 0.2)))
+		(		(defend (trigger ((EnemyDetected 0.0 ==)(DarkTemplarCount 8.0 >=))) ForceScouting(seconds 0.02)))
 		(		(scout (trigger ((ArchivesCount 1.0 >=) (NaturalFound 0.0 ==))) exploreLocal (seconds 0.001)))
 		(		(harvest (trigger ((IdleProbes))) probeHarvesting(seconds 0.0003)))
 		(		(retreat (trigger ((ForceIsLosing 1.0 =))) flee(seconds 1.0)))		
 		(		(researchObserver (trigger ((ObservatoryCount 1.0 >=)(HaveOberverUpgrade 0.0 ==))) ObserverResearch(seconds 0.0007)))
 
-		(		(attackZerg (trigger ((DarkTemplarCount 4.0 >=)(ZealotCount 5.0 >=)(ObservatoryCount 0.0 ==)(EnemyRace 0.0 ==))) attackEnemy(seconds 0.0002)))
+		(		(attackZergEarly (trigger ((ZealotCount 5.0 >=)(ObservatoryCount 0.0 ==)(EnemyRace 0.0 ==))) attackEnemy(seconds 0.02)))
 		(		(attackZerg (trigger ((DarkTemplarCount 10.0 >=)(ObservatoryCount 0.0 ==)(EnemyRace 0.0 ==))) attackEnemy(seconds 0.0002)))
 		(		(attackZerg (trigger ((DarkTemplarCount 10.0 >=)(ObservatoryCount 1.0 >=) (ObserverCount 1.0 >=)(EnemyRace 0.0 ==))) attackEnemy(seconds 0.0002)))
 		(		(researchZerg (trigger ((CitadelCount 1.0 >=)(NeedResearch 1.0 ==)(EnemyRace 0.0 ==))) OneBaseSpeedZealotResearch(seconds 0.0007)))
 		(		(createForceZerg (trigger ((GatewayCount 1.0 >=) (AvailableSupply 3.0 >)(EnemyRace 0.0 ==))) OneBaseSpeedZealotForce(seconds 0.0010)))	
 		(		(buildZerg (trigger ((NeedBuilding 1.0 =)(EnemyRace 0.0 ==))) OneBaseSpeedZealotBuild(seconds 0.0001)))
 
-		(		(attackTerran (trigger ((DarkTemplarCount 4.0 >=)(EnemyRace 1.0 ==))) attackEnemy(seconds 0.001)))
+		(		(defend (trigger ((EnemyDetected 1.0 ==)(BaseUnderAttack 1.0 ==))) DefendTerran(seconds 0.002)))
+		(		(attackTerran (trigger ((DarkTemplarCount 4.0 >=)(EnemyRace 1.0 ==)(BaseUnderAttack 0.0 ==))) attackEnemy(seconds 0.001)))
 		(		(researchTerran (trigger ((ForgeCount 1.0 >=)(NeedResearch 1.0 ==)(EnemyRace 1.0 ==))) TwoGateDarkTemplarResearch(seconds 0.0015)))
-		(		(createForceTerran (trigger ((GatewayCount 1.0 >=)(AvailableSupply 3.0 >)(EnemyRace 1.0 ==))) TwoGateDarkTemplarForce(seconds 0.002)))	
+		(		(createForceTerran (trigger ((GatewayCount 1.0 >=)(AvailableSupply 3.0 >)(EnemyRace 1.0 ==))) TwoGateDarkTemplarForce(seconds 0.002)))
+		(		(createForceTerranMidGame (trigger ((EnterMidGame 1.0 ==)(AvailableSupply 3.0 >)(EnemyRace 1.0 ==))) TerranMidGameForce(seconds 0.002)))	
 		(		(buildTerran (trigger ((NeedBuilding 1.0 ==)(EnemyRace 1.0 ==))) TwoGateDarkTemplarBuild(seconds 0.0001)))
 
 		(		(scoutProtoss (trigger ((NaturalFound 0.0 ==) (EnemyRace 2.0 ==) (ForgeCount 1.0 >=))) exploreLocal (seconds 0.001)))

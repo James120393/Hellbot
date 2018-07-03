@@ -13,6 +13,7 @@ namespace POSH_StarCraftBot.behaviours
     public class CombatControl : AStarCraftBehaviour
     {
 		public bool defendBase = false;
+		public bool enterMidGame = false;
 		private int maxBaseLocations;
 		private int baseCounter = 1;
 
@@ -97,7 +98,7 @@ namespace POSH_StarCraftBot.behaviours
         /// Each race has specific units that need prioritising hence three seperate functions
         /// </summary>
         // Attack function for terran
-		private bool MoveForceTerran(BaseLocation moveLocation, bool builder, bool harras)
+		private bool MoveForceTerran(BaseLocation moveLocation, bool builder, bool defend)
 		{
 			try
 			{
@@ -108,9 +109,14 @@ namespace POSH_StarCraftBot.behaviours
 				if (builder)
 					force = Interface().GetAllUnits(false).Concat(Interface().GetAllUnits(true));
                 // if the enemy needs harrasing
-				if (harras)
+				if (defend)
+				{
 					force = Interface().GetAllUnits(false).Where(unit => unit.getType() == bwapi.UnitTypes_Protoss_Dark_Templar);
-
+					foreach (Unit unit in force)
+					{
+						unit.attack(moveLocation.getPosition());
+					}
+				}
 				Position location = new Position(moveLocation.getTilePosition());
 				foreach (Unit unit in force)
 				{
@@ -122,7 +128,7 @@ namespace POSH_StarCraftBot.behaviours
 						{
                             // get the closest Ground units only
 							IEnumerable<Unit> enemy = enemies.Where(eunit => !eunit.getType().isFlyer()).OrderBy(eunit => bwta.getGroundDistance(unit.getTilePosition(), eunit.getTilePosition()));
-							unit.attack(location);
+							//unit.attack(location);
 							try
 							{
                                 // attack detectors first
@@ -150,15 +156,10 @@ namespace POSH_StarCraftBot.behaviours
 									catch
 									{
                                         // if all else fails just attack the location
-										unit.attack(location);
+										break;
 									}
 								}
 							}
-						}
-						else
-						{
-                            // if there are no enemies in the list then attack the location
-							unit.attack(location);
 						}
 					}
 				}
@@ -327,36 +328,24 @@ namespace POSH_StarCraftBot.behaviours
 			IEnumerable<Unit> force = null;
 			force = Interface().GetAllUnits(false).Where(un => un.getHitPoints() > 0);
 
-				IEnumerable<BaseLocation> baseloc = Interface().basePositions;
+			IEnumerable<BaseLocation> baseloc = Interface().basePositions;
 
-				if (baseloc.Count() > maxBaseLocations)
-					maxBaseLocations = baseloc.Count();
-				if (baseloc.Count() < maxBaseLocations && baseCounter > baseloc.Count())
-					return false;
-				// reached the last accessible base location away and turn back to base
-				if (baseCounter > maxBaseLocations)
-					baseCounter = 1;
+			if (baseloc.Count() > maxBaseLocations)
+				maxBaseLocations = baseloc.Count();
+			if (baseloc.Count() < maxBaseLocations && baseCounter > baseloc.Count())
+				return false;
+			// reached the last accessible base location away and turn back to base
+			if (baseCounter > maxBaseLocations)
+				baseCounter = 1;
 
+			// still scouting
+			if (force.All(unit => unit.isMoving()))
+				return true;
 
-				if (force.All(unit => unit.isUnderAttack()))
-				{
-					if (Interface().baseLocations.ContainsKey((int)BuildSite.Natural))
-						force.All(unit => unit.move(new Position(Interface().baseLocations[(int)BuildSite.Natural])));
-					else if (Interface().baseLocations.ContainsKey((int)BuildSite.Extension))
-					{
-						force.All(unit => unit.move(new Position(Interface().baseLocations[(int)BuildSite.Extension])));
-					}
-					return false;
-				}
-
-
-				// still scouting
-				if (force.All(unit => unit.isMoving()))
-					return true;
-
-				double distance = force.First().getPosition().getDistance(
-					baseloc.OrderBy(loc => bwta.getGroundDistance(loc.getTilePosition(), Interface().baseLocations[(int)BuildSite.StartingLocation]))
-						.ElementAt(baseCounter)
+			foreach (Unit unit in force)
+			{
+				double distance = unit.getPosition().getDistance(
+					baseloc.ElementAt(baseCounter)
 						.getPosition()
 						);
 				if (distance < DELTADISTANCE * 2)
@@ -367,15 +356,26 @@ namespace POSH_StarCraftBot.behaviours
 					baseCounter++;
 					return true;
 				}
-				else
+			}
+
+			bool executed = false;
+			if (baseloc.Count() > baseCounter)
+				foreach (Unit unit in force)
 				{
-					bool executed = false;
-					if (baseloc.Count() > baseCounter)
-						executed = force.All(unit => unit.move(baseloc.ElementAt(baseCounter).getPosition()));
-					// if (_debug_)
-					Console.Out.WriteLine("Force is scouting: " + executed);
-					return executed;
+					try
+					{
+						unit.attack(baseloc.ElementAt(baseCounter).getPosition());
+					}
+					catch
+					{
+						continue;
+					}
 				}
+			//executed = force.All(unit => unit.move(baseloc.ElementAt(baseCounter).getPosition()));
+			// if (_debug_)
+			Console.Out.WriteLine("Force is scouting: " + executed);
+			return executed;
+
 
 		}
 
@@ -517,6 +517,15 @@ namespace POSH_StarCraftBot.behaviours
                 }
             }
 
+			foreach (Unit midUnit in shownUnits)
+			{
+				if (midUnit.getHitPoints() > 0 && midUnit.getType() == bwapi.UnitTypes_Terran_Science_Vessel)
+				{
+					enterMidGame = true;
+					break;
+				}
+			}
+
             // Go through each enemy unit
 			foreach (Unit unit in shownUnits)
 			{
@@ -535,6 +544,12 @@ namespace POSH_StarCraftBot.behaviours
 				}
 			}
 			return (detectedNew) ? 1 : 0;
+		}
+
+		[ExecutableSense("EnterMidGame")]
+		public bool EnterMidGame()
+		{
+			return enterMidGame;
 		}
 
         // Is the base under attack
@@ -617,7 +632,7 @@ namespace POSH_StarCraftBot.behaviours
 		{
 			try
 			{
-				return MoveForceTerran(Interface().basePositions.First(), false, false);
+				return MoveForceTerran(Interface().basePositions.Last(), false, true);
 			}
 			catch
 			{

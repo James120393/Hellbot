@@ -315,6 +315,10 @@
 		(
 		(buildFirstGateway (trigger ((GatewayCount 0.0 <=) (PylonCount 1.0 >=))) buildGateway)	)
 		(
+		(buildForge (trigger ((ForgeCount 0.0 ==) (PylonCount 1.0 >=))) buildForge)	)
+		(
+		(buildBaseCannon (trigger ((ForgeCount 1.0 >=) (CannonCount 1.0 <=))) buildBaseCannon)	)
+		(
 		(buildProbes (trigger ((ProbeCount 10.0 <))) BuildProbe) )
 		(
 		(buildAssimilator (trigger ((AssimilatorCount 0.0 <=) (GatewayCount 1.0 >=))) buildAssimilator)	)
@@ -322,6 +326,8 @@
 		(buildProbes (trigger ((ProbeCount 12.0 <))) BuildProbe) )
 		(
 		(buildCyberneticsCore (trigger ((CyberneticsCoreCount 0.0 ==)(AssimilatorCount 1.0 >=))) buildCyberneticsCore)	)
+		(
+		(buildBaseCannon (trigger ((ForgeCount 1.0 >=) (CannonCount 2.0 <=))) buildBaseCannon)	)
 		(
 		(buildProbes (trigger ((ProbeCount 14.0 <))) BuildProbe) )
 		(
@@ -459,7 +465,7 @@
 
 (SDC EighteenNexusOpening (goal ((GameRunning 0.0 =)))
 	(drives			
-		(		(defend (trigger ((EnemyDetected 0.0 ==)(DarkTemplarCount 8.0 >=))) ForceScouting(seconds 0.002)))
+		(		(defend (trigger ((EnemyDetected 0.0 ==)(DarkTemplarCount 8.0 >=))) ForceScouting(seconds 0.01)))
 		(		(scout (trigger ((ArchivesCount 1.0 >=) (NaturalFound 0.0 ==))) exploreLocal (seconds 0.001)))
 		(		(harvest (trigger ((IdleProbes))) probeHarvesting(seconds 0.0003)))
 		(		(retreat (trigger ((ForceIsLosing 1.0 =))) flee(seconds 1.0)))		
@@ -474,7 +480,7 @@
 		(		(buildZerg (trigger ((NeedBuilding 1.0 =)(EnemyRace 0.0 ==))) OneBaseSpeedZealotBuild(seconds 0.0001)))
 
 		(		(defend (trigger ((EnemyDetected 1.0 ==)(BaseUnderAttack 1.0 ==))) DefendTerran(seconds 0.002)))
-		(		(attackTerran (trigger ((DarkTemplarCount 4.0 >=)(EnemyRace 1.0 ==)(BaseUnderAttack 0.0 ==))) attackEnemy(seconds 0.001)))
+		(		(attackTerran (trigger ((DarkTemplarCount 8.0 >=)(EnemyRace 1.0 ==)(BaseUnderAttack 0.0 ==))) attackEnemy(seconds 0.001)))
 		(		(researchTerran (trigger ((ForgeCount 1.0 >=)(NeedResearch 1.0 ==)(EnemyRace 1.0 ==))) TwoGateDarkTemplarResearch(seconds 0.0015)))
 		(		(createForceTerran (trigger ((GatewayCount 1.0 >=)(AvailableSupply 3.0 >)(EnemyRace 1.0 ==))) TwoGateDarkTemplarForce(seconds 0.002)))
 		(		(createForceTerranMidGame (trigger ((EnterMidGame 1.0 ==)(AvailableSupply 3.0 >)(EnemyRace 1.0 ==))) TerranMidGameForce(seconds 0.002)))	

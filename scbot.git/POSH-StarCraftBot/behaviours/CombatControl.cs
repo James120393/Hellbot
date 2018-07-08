@@ -152,6 +152,11 @@ namespace POSH_StarCraftBot.behaviours
 										{
 											unit.attack(enemyBuildingsPositions.First().Value);
 										}
+										else
+										{
+											// is enemy list is empty attack the location
+											unit.attack(location);
+										}
 									}
 									catch
 									{
@@ -226,6 +231,11 @@ namespace POSH_StarCraftBot.behaviours
 										{
 											unit.attack(enemyBuildingsPositions.First().Value);
 										}
+										else
+										{
+											// is enemy list is empty attack the location
+											unit.attack(location);
+										}
 									}
 									catch
 									{
@@ -298,6 +308,11 @@ namespace POSH_StarCraftBot.behaviours
 										if (enemyBuildingsPositions.Count() > 0)
 										{
 											unit.attack(enemyBuildingsPositions.First().Value);
+										}
+										else
+										{
+											// is enemy list is empty attack the location
+											unit.attack(location);
 										}
 									}
 									catch

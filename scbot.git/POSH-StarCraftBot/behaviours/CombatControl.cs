@@ -111,7 +111,7 @@ namespace POSH_StarCraftBot.behaviours
                 // if the enemy needs harrasing
 				if (defend)
 				{
-					force = Interface().GetAllUnits(false).Where(unit => unit.getType() == bwapi.UnitTypes_Protoss_Dark_Templar);
+					force = Interface().GetAllUnits(false);
 					foreach (Unit unit in force)
 					{
 						unit.attack(moveLocation.getPosition());
@@ -155,11 +155,16 @@ namespace POSH_StarCraftBot.behaviours
 									}
 									catch
 									{
-                                        // if all else fails just attack the location
-										break;
+										// if all else fails attack the location
+										unit.attack(location);
 									}
 								}
 							}
+						}
+						else
+						{
+							// is enemy list is empty attack the location
+							unit.attack(location);
 						}
 					}
 				}
@@ -364,7 +369,7 @@ namespace POSH_StarCraftBot.behaviours
 				{
 					try
 					{
-						unit.attack(baseloc.ElementAt(baseCounter).getPosition());
+						unit.attack(baseloc.Skip(baseCounter).First().getPosition());
 					}
 					catch
 					{

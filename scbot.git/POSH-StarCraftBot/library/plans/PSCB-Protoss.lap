@@ -465,7 +465,7 @@
 
 (SDC EighteenNexusOpening (goal ((GameRunning 0.0 =)))
 	(drives			
-		(		(defend (trigger ((EnemyDetected 0.0 ==)(DarkTemplarCount 8.0 >=))) ForceScouting(seconds 0.01)))
+		(		(defend (trigger ((DarkTemplarCount 8.0 >=)(EnemyDetected 0.0 ==))) ForceScouting(seconds 0.001)))	
 		(		(scout (trigger ((ArchivesCount 1.0 >=) (NaturalFound 0.0 ==))) exploreLocal (seconds 0.001)))
 		(		(harvest (trigger ((IdleProbes))) probeHarvesting(seconds 0.0003)))
 		(		(retreat (trigger ((ForceIsLosing 1.0 =))) flee(seconds 1.0)))		
@@ -483,7 +483,8 @@
 		(		(attackTerran (trigger ((DarkTemplarCount 8.0 >=)(EnemyRace 1.0 ==)(BaseUnderAttack 0.0 ==))) attackEnemy(seconds 0.001)))
 		(		(researchTerran (trigger ((ForgeCount 1.0 >=)(NeedResearch 1.0 ==)(EnemyRace 1.0 ==))) TwoGateDarkTemplarResearch(seconds 0.0015)))
 		(		(createForceTerran (trigger ((GatewayCount 1.0 >=)(AvailableSupply 3.0 >)(EnemyRace 1.0 ==))) TwoGateDarkTemplarForce(seconds 0.002)))
-		(		(createForceTerranMidGame (trigger ((EnterMidGame 1.0 ==)(AvailableSupply 3.0 >)(EnemyRace 1.0 ==))) TerranMidGameForce(seconds 0.002)))	
+		(		(createForceTerranMidGame (trigger ((EnterMidGame 1.0 ==)(AvailableSupply 3.0 >)(EnemyRace 1.0 ==))) TerranMidGameForce(seconds 0.002)))
+
 		(		(buildTerran (trigger ((NeedBuilding 1.0 ==)(EnemyRace 1.0 ==))) TwoGateDarkTemplarBuild(seconds 0.0001)))
 
 		(		(defend (trigger ((EnemyRace 2.0 ==) (EnemyDetected 1.0 ==)(BaseUnderAttack 1.0 ==))) DefendProtoss(seconds 0.002)))

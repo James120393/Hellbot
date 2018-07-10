@@ -539,7 +539,7 @@ namespace POSH_StarCraftBot.behaviours
 
 			foreach (Unit midUnit in shownUnits)
 			{
-				if (midUnit.getHitPoints() > 0 && midUnit.getType() == bwapi.UnitTypes_Terran_Science_Vessel)
+				if (midUnit.getHitPoints() > 0 && midUnit.getType().isFlyer())
 				{
 					enterMidGame = true;
 					break;

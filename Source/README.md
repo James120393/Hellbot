@@ -46,8 +46,6 @@ compile first bwapii-native then bwapi-clr and then right click on POSH-Launcher
 ## The link to the GitHub Repository:
 [link]("https://github.com/James120393/Hellbot")
 
-## To open a plan please open the ABODEstar-004.jar located at:
-"Source\scbot.git\POSH-StarCraftBot\ABODEstar-004.jar"
 
 ## Then select open and navigate to:
 "Source\scbot.git\POSH-StarCraftBot\library\plans"

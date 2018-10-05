@@ -44,7 +44,7 @@ compile first bwapii-native then bwapi-clr and then right click on POSH-Launcher
 
 
 ## The link to the GitHub Repository:
-[link]("https://github.com/James120393/Hellbot")
+[link](https://github.com/James120393/Hellbot)
 
 
 ## Then select open and navigate to:

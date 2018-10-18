@@ -8,7 +8,7 @@ Source\scbot.git\POSH-Launcher\bin\Release
 ### Note: You will Need to install StarCraft: BroodWar with patch 1.16.1 
 ### plus ChaosLauncher which can be found [here](http://www.teamliquid.net/forum/brood-war/65196-chaoslauncher-for-1161)
 ### Note: The Bot must be run in admin mode otherwise it will not connect to the game.
-The batch file should ask for admin. if it does not then it will not work, to circumven this you must run the POSH-Launcher.exe
+The batch file should ask for admin. if it does not then it will not work, to circumvent this you must run the POSH-Launcher.exe
 in the command line while running in admin, with the following argument after "-a=POSH-HellBot.dll POSH-HellBot".
 
 

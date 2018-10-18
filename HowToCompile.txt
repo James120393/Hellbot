@@ -1,0 +1,51 @@
+You will need the following:
+StarCraft with the Broodwars Expansion
+patch the game to Version 1.16.1
+Visual Studio 2010 (Express) for C# and C++
+BWAPI 3.7.4
+
+
+
+Setup the Environment:
+Install the game and patch to version 1.16.1
+(the patch needs to be run as administrator otherwise it won't install)
+
+download and unpack/install BWAPI
+use a location where you normally store projects, lets assume C:\Users\[User]\Documents\Projects\BWAPI
+
+install C:\Users\[User]\Documents\Projects\BWAPI\vcredist_x86 as well 
+otherwise you could run into an issue where the game will tell you you are missing a library
+
+copy the four files (mpfr-vc90-mt-gd.dll,mpfr-vc90-mt.dll,gmp-vc90-mt-gd.dll,gmp-vc90-mt.dll) 
+from the BWAPI WINDOWS into two of your Windows installation folders (system32,SysWOW64)
+
+To Compile the Bot you will require BWAPI-MonoBridge.
+
+Either dowload the BWAPI Bridge as an archive and extract in the bwapi folder into the bridge 
+folder or git clone from "https://github.com/suegy/bwapi-mono-bridge2.git" into the same folder
+
+navigate to the following and run:
+
+"bwapi-mono-bridge2-master\Source\bwapi-clr-client\bwapi-clr-client.sln"
+
+Make sure to run this in VS 2010
+
+VS will complain that some projects werent loaded correctly, this is fine.
+
+In the "Solution Explorer" Select "POSH-Launcher"
+Then in project "Properties" change the "Project Folder" and navigate to the following in the
+Bot folder "HellBot\Source\scbot.git\POSH-Launcher" and select "POSH-Launcher.csproj"
+Then Right clikc "POSH-Launcher" in the "Solution Explorer" and select Reload
+
+In the "Solution Explorer" Select "POSH-StarCraftBot"
+Then in project "Properties" change the "Project Folder" and navigate to the following in the
+Bot folder "HellBot\Source\scbot.git\POSH-StarCraftBot" and select "POSH-StarCraftBot.csproj"
+Then Right clikc "POSH-StarCraftBot" in the "Solution Explorer" and select Reload
+
+Once these two are loaded in simply right click on "POSH-StarCraftBot" in the "Solution Explorer"
+and Rebuild. Then do the same for "POSH-Launcher" this will rebuild the bot and its libraries.
+
+The "AI\Bot" folder in the HellBot file contains these rebuilt libraries that can be found in the following:
+"HellBot\Source\scbot.git\POSH-Launcher\bin\Release"
+
+The only additional file in the "AI\Bot" file is the dummy HellBot.dll
